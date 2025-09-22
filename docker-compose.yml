@@ -1,9 +1,10 @@
 version: "3.9"
+name: stockpile
 
 services:
   backend:
     build: ./backend
-    container_name: storage-backend
+    container_name: stockpile-backend
     # Keep backend internal to the Docker network (no host port)
     ports:
       - "8000:8000"
@@ -14,7 +15,7 @@ services:
 
   frontend:
     build: ./web
-    container_name: storage-frontend
+    container_name: stockpile-frontend
     ports:
       - "8080:80"
     depends_on:

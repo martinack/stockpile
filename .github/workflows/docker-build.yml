@@ -27,6 +27,7 @@ jobs:
         with:
           context: ./backend
           file: ./backend/Dockerfile
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: |
             martinack/stockpile-backend:${{ github.ref_name }}
@@ -37,6 +38,7 @@ jobs:
         with:
           context: ./web
           file: ./web/Dockerfile
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: |
             martinack/stockpile-web:${{ github.ref_name }}
