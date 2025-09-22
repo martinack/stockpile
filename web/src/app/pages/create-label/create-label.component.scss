@@ -1,0 +1,27 @@
+/* Datei: web/src/app/pages/create-label/create-label.component.scss */
+.form-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.slider-row {
+  display: grid;
+  gap: 8px;
+}
+
+.slider-label {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 500;
+}
+
+.actions {
+  display: grid;
+  gap: 10px;
+}
+
+@media (min-width: 640px) {
+  .actions {
+    grid-template-columns: 1fr 1fr;
+  }
+}

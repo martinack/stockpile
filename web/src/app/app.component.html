@@ -1,0 +1,29 @@
+<mat-toolbar color="primary">
+  <span class="app-title">{{ title }}</span>
+  <span class="spacer"></span>
+  <button mat-icon-button aria-label="Home" routerLink="/">
+    <mat-icon>home</mat-icon>
+  </button>
+</mat-toolbar>
+
+<main class="app-container">
+  <router-outlet></router-outlet>
+</main>
+
+<!-- Bottom navigation for mobile -->
+<nav class="bottom-nav mat-elevation-z8">
+  <mat-toolbar>
+    <button mat-button class="nav-btn" routerLink="/create" aria-label="Neues Label">
+      <mat-icon>add_circle</mat-icon>
+      <span class="label">Erstellen</span>
+    </button>
+    <button mat-button class="nav-btn" routerLink="/scan" aria-label="Scannen">
+      <mat-icon>qr_code_scanner</mat-icon>
+      <span class="label">Scannen</span>
+    </button>
+    <button mat-button class="nav-btn" routerLink="/" aria-label="Start">
+      <mat-icon>home</mat-icon>
+      <span class="label">Home</span>
+    </button>
+  </mat-toolbar>
+</nav>

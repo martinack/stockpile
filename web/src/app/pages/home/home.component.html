@@ -1,0 +1,56 @@
+<section class="home">
+  <div class="hero mat-elevation-z2">
+    <h1 class="hero-title">Lagerhaltung</h1>
+    <p class="hero-sub">Verwalte deine Bestände schnell und einfach.</p>
+  </div>
+
+  <div class="actions-grid">
+    <mat-card class="action-card" routerLink="/create" tabindex="0" role="button" matRipple>
+      <mat-card-header>
+        <div mat-card-avatar class="icon-avatar">
+          <mat-icon>add_circle</mat-icon>
+        </div>
+        <mat-card-title>Neues Label erstellen</mat-card-title>
+        <mat-card-subtitle>Artikel anlegen und QR-Label drucken</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Erfasse Name, Datum, Menge und Anzahl – fertig in Sekunden.</p>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="primary" class="full-btn">Erstellen</button>
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card class="action-card" routerLink="/scan" tabindex="0" role="button" matRipple>
+      <mat-card-header>
+        <div mat-card-avatar class="icon-avatar">
+          <mat-icon>qr_code_scanner</mat-icon>
+        </div>
+        <mat-card-title>Scannen</mat-card-title>
+        <mat-card-subtitle>Artikel per Kamera finden und ausbuchen</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Öffne den Scanner und halte den Code in die Kamera.</p>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-stroked-button color="primary" class="full-btn">Scanner öffnen</button>
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card class="action-card" routerLink="/locations" tabindex="0" role="button" matRipple>
+      <mat-card-header>
+        <div mat-card-avatar class="icon-avatar">
+          <mat-icon>warehouse</mat-icon>
+        </div>
+        <mat-card-title>Lagerorte</mat-card-title>
+        <mat-card-subtitle>Orte anlegen und verwalten</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Strukturiere deine Bestände nach Lagerorten.</p>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-stroked-button color="primary" class="full-btn">Öffnen</button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</section>

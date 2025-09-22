@@ -1,0 +1,46 @@
+<!-- Datei: web/src/app/pages/locations/locations.component.html -->
+<mat-card class="mat-elevation-z2">
+  <mat-card-header>
+    <div mat-card-avatar>
+      <mat-icon>warehouse</mat-icon>
+    </div>
+    <mat-card-title>Lagerorte</mat-card-title>
+    <mat-card-subtitle>Orte anlegen und verwalten</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="top-actions">
+      <button mat-raised-button color="primary" (click)="openCreateDialog()">
+        <mat-icon>add</mat-icon>
+        Lager anlegen
+      </button>
+      <button mat-stroked-button color="primary" routerLink="/">
+        <mat-icon>arrow_back</mat-icon>
+        Zurück
+      </button>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div class="list-wrap" *ngIf="!loading; else loadingTpl">
+      <mat-list role="list" *ngIf="locations?.length; else emptyTpl">
+        <mat-list-item role="listitem" *ngFor="let loc of locations">
+          <mat-icon matListItemIcon>location_on</mat-icon>
+          <div matListItemTitle>{{ loc.name }}</div>
+          <div matListItemLine class="muted">ID: {{ loc.id }}</div>
+          <button mat-icon-button color="warn" aria-label="Löschen" (click)="delete(loc)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-list-item>
+      </mat-list>
+    </div>
+
+    <ng-template #loadingTpl>
+      <div class="muted">Lade Lagerorte…</div>
+    </ng-template>
+
+    <ng-template #emptyTpl>
+      <div class="muted">Noch keine Lagerorte vorhanden.</div>
+    </ng-template>
+  </mat-card-content>
+</mat-card>

@@ -1,0 +1,60 @@
+<mat-card class="scan-card mat-elevation-z2">
+  <mat-card-header>
+    <div mat-card-avatar>
+      <mat-icon>qr_code_scanner</mat-icon>
+    </div>
+    <mat-card-title>Scanner</mat-card-title>
+    <mat-card-subtitle>Richte den QR-Code in den Rahmen</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="scanner-container">
+      <zxing-scanner
+        class="scanner"
+        [device]="currentDevice"
+        [autostart]="true"
+        [enable]="true"
+        [formats]="allowedFormats"
+        [tryHarder]="tryHarder"
+        [timeBetweenScans]="timeBetweenScans"
+        [torch]="torch"
+        (scanSuccess)="onScan($event)"
+        (permissionResponse)="onPermission($event)"
+        (camerasFound)="onCamerasFound($event)"
+        (torchCompatible)="onTorchCompatible($event)">
+      </zxing-scanner>
+
+      <!-- Visual overlay with mask and corner borders -->
+      <div class="overlay">
+        <div class="scan-area">
+          <div class="corner tl"></div>
+          <div class="corner tr"></div>
+          <div class="corner bl"></div>
+          <div class="corner br"></div>
+        </div>
+      </div>
+
+      <!-- Torch control -->
+      <button mat-fab extended color="primary"
+              class="torch-btn"
+              *ngIf="torchAvailable"
+              (click)="toggleTorch()">
+        <mat-icon>{{ torch ? 'flashlight_on' : 'flashlight_off' }}</mat-icon>
+        <span>{{ torch ? 'Lampe an' : 'Lampe aus' }}</span>
+      </button>
+    </div>
+
+    <div class="hint" *ngIf="!hasPermission">
+      <mat-icon>info</mat-icon>
+      Kamera-Berechtigung benötigt. Bitte erlauben und Seite ggf. neu laden.
+    </div>
+
+    <div class="result" *ngIf="item">
+      <h3>Gefundener Eintrag</h3>
+      <p><strong>Name:</strong> {{ item.name }}</p>
+      <p><strong>Code:</strong> {{ item.code }}</p>
+      <p><strong>Datum:</strong> {{ item.created_at }}</p>
+      <button mat-raised-button color="primary" (click)="checkout()">Ausbuchen</button>
+    </div>
+  </mat-card-content>
+</mat-card>

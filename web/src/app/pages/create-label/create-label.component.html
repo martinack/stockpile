@@ -1,0 +1,72 @@
+<mat-card class="mat-elevation-z2">
+  <mat-card-header>
+    <div mat-card-avatar>
+      <mat-icon>label</mat-icon>
+    </div>
+    <mat-card-title>Neues Label</mat-card-title>
+    <mat-card-subtitle>Artikel anlegen und QR-Label erstellen</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <form (ngSubmit)="saveLabel()" #form="ngForm" class="form-grid">
+
+      <mat-form-field appearance="outline">
+        <mat-label>Name</mat-label>
+        <input
+          matInput
+          type="text"
+          placeholder="z. B. Suppe"
+          [(ngModel)]="name"
+          name="name"
+          required />
+        <button mat-icon-button matSuffix type="button" aria-label="Spracheingabe Name" (click)="startVoiceInput('name')">
+          <mat-icon>mic</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Menge</mat-label>
+        <input
+          matInput
+          type="text"
+          placeholder="z. B. 500 ml"
+          [(ngModel)]="menge"
+          name="menge" />
+        <button mat-icon-button matSuffix type="button" aria-label="Spracheingabe Menge" (click)="startVoiceInput('menge')">
+          <mat-icon>mic</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Lager auswählen</mat-label>
+        <mat-select [(ngModel)]="selectedWarehouseId" name="warehouseId" [disabled]="locationsLoading" required>
+          <mat-option [value]="null">Keinem Lager zuordnen</mat-option>
+          <mat-option *ngFor="let loc of locations" [value]="loc.id">
+            {{ loc.name }}
+          </mat-option>
+        </mat-select>
+        <mat-hint *ngIf="locationsLoading">Lade Lager…</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Datum</mat-label>
+        <input
+          matInput
+          [matDatepicker]="picker"
+          [(ngModel)]="date"
+          name="date" />
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+
+      <div class="actions">
+        <button mat-raised-button color="primary" type="submit">
+          Speichern &amp; Label erstellen
+        </button>
+        <button mat-stroked-button color="primary" type="button" routerLink="/">
+          Zurück
+        </button>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>
