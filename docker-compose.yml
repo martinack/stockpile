@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  backend:
+    build: ./backend
+    container_name: storage-backend
+    # Keep backend internal to the Docker network (no host port)
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/data:/app/data
+      - ./backend/qrcodes:/app/qrcodes
+    restart: unless-stopped
+
+  frontend:
+    build: ./web
+    container_name: storage-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
