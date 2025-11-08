@@ -1,5 +1,5 @@
-# 1) Build stage
-FROM node:20-alpine AS builder
+# 1) Build stage - force native platform (AMD64) to avoid esbuild emulation issues
+FROM --platform=$BUILDPLATFORM node:20-alpine AS builder
 
 WORKDIR /app/web
 
