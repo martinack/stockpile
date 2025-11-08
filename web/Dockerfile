@@ -36,7 +36,7 @@ RUN printf '%s\n' \
   '' \
   '  # Proxy API requests to backend' \
   '  location /api {' \
-  '    proxy_pass http://lager.lan:9000;' \
+  '    proxy_pass http://lager.lan:9000/;' \
   '    proxy_http_version 1.1;' \
   '    proxy_set_header Host $host;' \
   '    proxy_set_header X-Real-IP $remote_addr;' \
