@@ -37,7 +37,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 })
 export class ItemCreatedDialogComponent {
   // Passe diese URL bei Bedarf an deine Backend-Base an
-  private readonly baseUrl = 'http://localhost:8000';
+  private readonly baseUrl = 'http://lager.lan:9000';
   qrUrl: string | null = null;
 
   constructor(

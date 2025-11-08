@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class ItemService {
-  private baseUrl = 'http://lager.lan/api/items'; // via nginx proxy
+  private baseUrl = 'http://lager.lan:9000/items'; // via nginx proxy
 
   constructor(private http: HttpClient) {}
 
