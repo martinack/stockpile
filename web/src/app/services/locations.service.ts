@@ -10,7 +10,7 @@ export interface StorageLocation {
 
 @Injectable({ providedIn: 'root' })
 export class LocationsService {
-  private readonly baseUrl = 'http://lager.home/api/warehouses';
+  private readonly baseUrl = 'http://lager.lan/api/warehouses';
 
   constructor(private http: HttpClient) {}
 

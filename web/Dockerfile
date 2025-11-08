@@ -25,6 +25,7 @@ RUN rm -f /etc/nginx/conf.d/default.conf
 RUN printf '%s\n' \
   'server {' \
   '  listen 80;' \
+  '  listen [::]:80;' \
   '  server_name _;' \
   '  root /usr/share/nginx/html;' \
   '  index index.html;' \
@@ -35,7 +36,7 @@ RUN printf '%s\n' \
   '' \
   '  # Proxy API requests to backend' \
   '  location /api {' \
-  '    proxy_pass http://lager.home:9000;' \
+  '    proxy_pass http://lager.lan:9000;' \
   '    proxy_http_version 1.1;' \
   '    proxy_set_header Host $host;' \
   '    proxy_set_header X-Real-IP $remote_addr;' \
