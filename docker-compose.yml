@@ -7,7 +7,7 @@ services:
     platform: linux/arm/v7
     container_name: stockpile-backend
     ports:
-      - "8000:8000"
+      - "9000:9000"
     volumes:
       - ./backend/data:/app/data
       - ./backend/qrcodes:/app/qrcodes
