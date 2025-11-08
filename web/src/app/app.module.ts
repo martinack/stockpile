@@ -33,6 +33,9 @@ import { LocationsComponent } from './pages/locations/locations.component';
 import { LocationsCreateDialogComponent } from './pages/locations/locations-create-dialog.component';
 import {MatSelectModule} from '@angular/material/select';
 import {ItemCreatedDialogComponent} from './pages/create-label/item-created-dialog.component';
+import { ItemsComponent, DeleteConfirmDialogComponent } from './pages/items/items.component';
+import { MatTableModule } from '@angular/material/table';
+import { MatRippleModule } from '@angular/material/core';
 
 @NgModule({
   declarations: [
@@ -43,6 +46,8 @@ import {ItemCreatedDialogComponent} from './pages/create-label/item-created-dial
     LocationsComponent,
     LocationsCreateDialogComponent,
     ItemCreatedDialogComponent,
+    ItemsComponent,
+    DeleteConfirmDialogComponent,
   ],
   imports: [
     ZXingScannerModule,
@@ -67,6 +72,8 @@ import {ItemCreatedDialogComponent} from './pages/create-label/item-created-dial
     FormsModule,
     MatSelectModule,
     MatDialogModule,
+    MatTableModule,
+    MatRippleModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
