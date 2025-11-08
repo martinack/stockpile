@@ -4,8 +4,8 @@ name: stockpile
 services:
   backend:
     build: ./backend
+    platform: linux/arm/v7
     container_name: stockpile-backend
-    # Keep backend internal to the Docker network (no host port)
     ports:
       - "8000:8000"
     volumes:
@@ -15,6 +15,7 @@ services:
 
   frontend:
     build: ./web
+    platform: linux/arm/v7
     container_name: stockpile-frontend
     ports:
       - "8080:80"
