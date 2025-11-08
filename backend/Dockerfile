@@ -10,6 +10,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     make \
     libffi-dev \
     libssl-dev \
+    libjpeg62-turbo-dev \
+    zlib1g-dev \
+    libtiff5 \
+    libopenjp2-7 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
