@@ -59,7 +59,7 @@ export class LabelCreateComponent implements OnInit {
 
     const warehouseId = this.selectedWarehouseId ?? null;
 
-    this.itemService.createItem(trimmed, warehouseId).subscribe({
+    this.itemService.createItem(trimmed, warehouseId, this.menge?.trim() || null).subscribe({
       next: (created) => {
         this.snackBar.open('Label erfolgreich erstellt.', 'OK', { duration: 3000, verticalPosition: "top" });
 

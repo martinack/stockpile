@@ -6,12 +6,14 @@ import { HomeComponent } from './pages/home/home.component';
 import { LabelCreateComponent } from './pages/create-label/create-label.component';
 import { ScanComponent } from './pages/scan/scan.component';
 import { LocationsComponent } from './pages/locations/locations.component';
+import { ItemsComponent } from './pages/items/items.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },        // Startseite
   { path: 'create', component: LabelCreateComponent }, // Neues Label erstellen
   { path: 'scan', component: ScanComponent },    // QR-Code Scanner
   { path: 'locations', component: LocationsComponent }, // Lagerorte
+  { path: 'items', component: ItemsComponent },  // Artikel Liste
   { path: '**', redirectTo: '' }                 // Fallback → Home
 ];
 

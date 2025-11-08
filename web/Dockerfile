@@ -33,6 +33,16 @@ RUN printf '%s\n' \
   '    try_files $uri $uri/ /index.html;' \
   '  }' \
   '' \
+  '  # Proxy API requests to backend' \
+  '  location /api {' \
+  '    proxy_pass http://lager.home:8000;' \
+  '    proxy_http_version 1.1;' \
+  '    proxy_set_header Host $host;' \
+  '    proxy_set_header X-Real-IP $remote_addr;' \
+  '    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;' \
+  '    proxy_set_header X-Forwarded-Proto $scheme;' \
+  '  }' \
+  '' \
   '  # Cache static assets aggressively (tweak as desired)' \
   '  location ~* \.(?:css|js|jpg|jpeg|gif|png|svg|ico|webp|woff2?)$ {' \
   '    expires 30d;' \
