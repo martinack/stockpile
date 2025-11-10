@@ -4,7 +4,6 @@ name: stockpile
 services:
   backend:
     build: ./backend
-    platform: linux/arm/v7
     container_name: stockpile-backend
     ports:
       - "9000:9000"
@@ -15,7 +14,6 @@ services:
 
   frontend:
     build: ./web
-    platform: linux/arm/v7
     container_name: stockpile-frontend
     ports:
       - "8080:80"
