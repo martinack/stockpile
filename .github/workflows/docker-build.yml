@@ -1,29 +1,61 @@
-name: Build and Push to Docker Hub
+name: Verify, Build and Publish
 
 on:
+  pull_request:
   push:
     tags:
       - 'v*'
 
 jobs:
-  build-and-push-amd64-arm64:
+  verify-code:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: Run backend tests
+        run: uv run --directory backend --group test pytest -q
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install and test frontend
+        working-directory: web
+        run: |
+          npm ci
+          npm run build
+          npm test -- --watch=false
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+  verify-compose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build and start the smoke-test stack
+        run: docker compose -f docker-compose.yml -f docker-compose.smoke.yml --project-name stockpile-smoke up --build --wait -d
+      - name: Exercise the API through the frontend proxy
+        run: python3 tests/docker_smoke.py
+      - name: Collect container logs
+        if: failure()
+        run: docker compose -f docker-compose.yml -f docker-compose.smoke.yml --project-name stockpile-smoke logs
+      - name: Remove smoke-test stack
+        if: always()
+        run: docker compose -f docker-compose.yml -f docker-compose.smoke.yml --project-name stockpile-smoke down --volumes
 
-      - name: Login to DockerHub
-        uses: docker/login-action@v3
+  build-and-push-amd64-arm64:
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
       - name: Build and push backend
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: ./backend
           file: ./backend/Dockerfile
@@ -32,9 +64,8 @@ jobs:
           tags: |
             martinack/stockpile-backend:${{ github.ref_name }}
             martinack/stockpile-backend:latest
-
       - name: Build and push web
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: ./web
           file: ./web/Dockerfile
@@ -45,28 +76,20 @@ jobs:
             martinack/stockpile-web:latest
 
   build-and-push-armv7:
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+      - uses: actions/checkout@v5
+      - uses: docker/setup-qemu-action@v3
         with:
           platforms: linux/arm/v7
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Login to DockerHub
-        uses: docker/login-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
       - name: Build and push backend ARM/v7
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: ./backend
           file: ./backend/Dockerfile

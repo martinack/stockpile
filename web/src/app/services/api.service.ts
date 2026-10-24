@@ -4,12 +4,12 @@ import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class ItemService {
-  private baseUrl = 'http://lager.lan:9000/items'; // via nginx proxy
+  private readonly baseUrl = '/api/items';
 
   constructor(private http: HttpClient) {}
 
   createItem(name: string, warehouseId: number | null = null, quantity: string | null = null): Observable<any> {
-    return this.http.post(this.baseUrl, { name, quantity, warehouse_id: warehouseId });
+    return this.http.post(`${this.baseUrl}/`, { name, quantity, warehouse_id: warehouseId });
   }
 
   getItem(code: string): Observable<any> {
@@ -21,7 +21,7 @@ export class ItemService {
   }
 
   listItems(search?: string): Observable<any> {
-    let url = this.baseUrl;
+    let url = `${this.baseUrl}/`;
     if (search) {
       url += `?search=${encodeURIComponent(search)}`;
     }

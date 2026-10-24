@@ -1,35 +1,38 @@
-# Builder stage with build tools for ARM/v7 compatibility
-FROM python:3.11 as builder
+FROM ghcr.io/astral-sh/uv:0.12.10 AS uv
 
+FROM python:3.13-slim AS builder
+
+COPY --from=uv /uv /uvx /bin/
 WORKDIR /app
+ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
 
-# Install build dependencies needed for compiling Python packages on ARM
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc \
-    g++ \
-    make \
-    libffi-dev \
-    libssl-dev \
-    libjpeg-dev \
-    libpng-dev \
-    libtiff-dev \
+    build-essential \
     libfreetype6-dev \
+    libjpeg-dev \
+    libtiff-dev \
+    libwebp-dev \
     zlib1g-dev \
-    liblcms2-dev \
-    libopenjp2-7-dev \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+COPY pyproject.toml uv.lock ./
+COPY stockpile ./stockpile
+RUN uv sync --locked --no-dev
 
-# Final stage with slim image
-FROM python:3.11-slim
+FROM python:3.13-slim AS runtime
 
 WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libfreetype6 \
+    libjpeg62-turbo \
+    libtiff6 \
+    libwebp7 \
+    zlib1g \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy installed packages from builder
-COPY --from=builder /install /usr/local
+COPY --from=builder /app/.venv /app/.venv
+COPY stockpile ./stockpile
 
-COPY . .
-
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+EXPOSE 8000
+HEALTHCHECK --interval=30s --timeout=3s --retries=3 CMD ["/app/.venv/bin/python", "-c", "from urllib.request import urlopen; urlopen('http://127.0.0.1:8000/health').read()"]
+CMD ["/app/.venv/bin/uvicorn", "stockpile.main:app", "--host", "0.0.0.0", "--port", "8000"]

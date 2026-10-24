@@ -1,5 +1,5 @@
 // Datei: web/src/app/pages/locations/locations.component.ts
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { LocationsService, StorageLocation } from '../../services/locations.service';
 import { MatDialog } from '@angular/material/dialog';
 import { LocationsCreateDialogComponent } from './locations-create-dialog.component';
@@ -18,7 +18,8 @@ export class LocationsComponent implements OnInit {
   constructor(
     private locationsService: LocationsService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private changeDetector: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -28,11 +29,16 @@ export class LocationsComponent implements OnInit {
   reload(): void {
     this.loading = true;
     this.locationsService.list().subscribe({
-      next: (data) => { this.locations = data ?? []; this.loading = false; },
+      next: (data) => {
+        this.locations = data ?? [];
+        this.loading = false;
+        this.changeDetector.detectChanges();
+      },
       error: () => {
         this.locations = [];
         this.loading = false;
         this.snackBar.open('Fehler beim Laden der Lagerorte.', 'OK', { duration: 4000 });
+        this.changeDetector.detectChanges();
       }
     });
   }

@@ -20,6 +20,18 @@
   gap: 10px;
 }
 
+.is-listening {
+  color: var(--mat-sys-primary, #3f51b5);
+}
+
+.voice-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: -8px 0 8px;
+  color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+}
+
 @media (min-width: 640px) {
   .actions {
     grid-template-columns: 1fr 1fr;

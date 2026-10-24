@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { ItemService } from '../../services/api.service';
 import { BarcodeFormat } from '@zxing/library';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -26,13 +26,20 @@ export class ScanComponent {
 
   constructor(private api: ItemService,
               private snackbar: MatSnackBar,
+              private changeDetector: ChangeDetectorRef,
               ) {}
 
   onScan(result: string) {
     if (!result) return;
     this.api.getItem(result).subscribe({
-      next: (data) => this.item = data,
-      error: () => this.item = null
+      next: (data) => {
+        this.item = data;
+        this.changeDetector.detectChanges();
+      },
+      error: () => {
+        this.item = null;
+        this.changeDetector.detectChanges();
+      }
     });
   }
 
@@ -42,6 +49,7 @@ export class ScanComponent {
       next: () => {
         this.snackbar.open('Eintrag ausgebucht!', 'OK', { duration: 3000, verticalPosition: "top" });
         this.item = null;
+        this.changeDetector.detectChanges();
       }
     });
   }

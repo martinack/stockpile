@@ -1,118 +1,54 @@
-# stockpile
+# Stockpile
 
-Basic stock management for private households.
+Stockpile is a mobile-friendly household inventory application for self-made food and other supplies. It creates QR labels, tracks quantities and storage locations, and lets a scanned label be checked out.
 
----
+## Run with Docker
 
-## Purpose
+Docker Compose starts the Angular frontend, FastAPI backend, SQLite database, and QR-code storage:
 
-**stockpile** is a simple application to help manage inventory in private households.
-The intention is to use it for self made food because it doesn't have barcodes.
-
-Further development will also support standard EAN codes which opens up a wider range of use cases.
-
----
-
-## Quickstart
-
-1. Create a docker-compose.yml
-```yaml
-version: "3.9"
-name: stockpile
-
-services:
-  backend:
-    image: martinack/stockpile-backend:latest
-    container_name: stockpile-backend
-    ports:
-      - "8000:8000"
-    volumes:
-      - ./backend/data:/app/data
-      - ./backend/qrcodes:/app/qrcodes
-    restart: unless-stopped
-
-  frontend:
-    image: martinack/stockpile-web:latest
-    container_name: stockpile-frontend
-    ports:
-      - "8080:80"
-    depends_on:
-      - backend
-    restart: unless-stopped
-```
-
-2. Run:
 ```bash
-docker compose pull
-docker compose up -d
+docker compose up -d --build
 ```
----
 
-## Features
+- Web UI: <http://localhost:8080>
+- Direct API: <http://localhost:9000>
+- API documentation: <http://localhost:9000/docs>
 
-Functional:
-* create storage locations
-* create items (name, quantity, storage location)
-* Create QR codes for items
-* Scan a qr-code and remove the items
+The browser uses its own `/api` path. Nginx proxies that path to the backend, so no frontend hostname or API port needs to be configured. SQLite data and generated QR images are kept in `backend/data` and `backend/qrcodes`.
 
-Technical:
-* REST-api for easy data-access
-* Web-frontend, optimized for mobile usage
-* Docker support
-
----
-
-## Architecture / Structure
-
-├── backend/ # API / server logic
-├── web/ # Frontend (UI)
-├── docker-compose.yml # Orchestration
-├── .github/ # CI / workflows
-└── .gitignore
-
-
-**Technologies used:**
-
-- Python (backend)
--- fastapi / uvicorn
--- sqlite
-- TypeScript / HTML / SCSS (frontend)
--- Angular / Angular Material
-
----
-
-## Getting Started
-
-## Requirements
-
-- [Docker](https://docs.docker.com/get-docker/) & Docker Compose  
-- Node.js & npm/yarn — if running the frontend separately  
-- Python & pip — if running the backend directly  
+Stop the stack with `docker compose down`. This preserves the bind-mounted inventory data.
 
 ## Development
 
-```bash
-# starting frontend
-cd web
-npm install
-npm start
+Requirements: Docker for deployment, Node.js 24.15.0 or later for the frontend, and [uv](https://docs.astral.sh/uv/) with Python 3.13 or later for the backend.
 
-# starting backend
+```bash
+# backend
 cd backend
-pip install -r requirements.txt
-uvicorn main:app --port 8000
+uv sync --group test
+uv run uvicorn stockpile.main:app --reload --port 9000
+
+# frontend, in another terminal
+cd web
+npm ci
+npm start
 ```
 
-Use feature branches for new development.
+The Angular development server proxies `/api` to `http://localhost:9000` through `web/proxy.conf.json`.
 
-## Contributing
+## Verification
 
-Contributions are welcome! You can help by:
+```bash
+# backend API and real QR-image generation
+cd backend && uv run --group test pytest
 
-* Reporting issues or bugs
-* Suggesting or implementing new features (e.g. expiry tracking, barcode scanning)
-* Improving the frontend UI
-* Writing documentation or tests
+# Angular build and unit tests
+cd web && npm run build && npm test
 
-Please open a pull request or an issue to get started.
+# full Compose smoke test, using disposable Docker volumes
+docker compose -f docker-compose.yml -f docker-compose.smoke.yml --project-name stockpile-smoke up --build --wait -d
+python3 tests/docker_smoke.py
+docker compose -f docker-compose.yml -f docker-compose.smoke.yml --project-name stockpile-smoke down --volumes
+```
+
+The smoke test exercises the API only through the frontend proxy, including warehouse and item lifecycle operations and PNG QR-code generation.

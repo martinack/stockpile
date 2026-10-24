@@ -10,7 +10,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
       <div class="meta">
         <div><strong>Name:</strong> {{ data.name }}</div>
         <div><strong>Code:</strong> {{ data.code }}</div>
-        <div *ngIf="data?.warehouse_id !== undefined">
+        <div *ngIf="data.warehouse_id !== undefined">
           <strong>Warehouse-ID:</strong> {{ data.warehouse_id ?? 'Keines' }}
         </div>
       </div>
@@ -36,8 +36,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
   `]
 })
 export class ItemCreatedDialogComponent {
-  // Passe diese URL bei Bedarf an deine Backend-Base an
-  private readonly baseUrl = 'http://lager.lan:9000';
+  private readonly baseUrl = '/api';
   qrUrl: string | null = null;
 
   constructor(

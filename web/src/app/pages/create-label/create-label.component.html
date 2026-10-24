@@ -19,7 +19,10 @@
           [(ngModel)]="name"
           name="name"
           required />
-        <button mat-icon-button matSuffix type="button" aria-label="Spracheingabe Name" (click)="startVoiceInput('name')">
+        <button mat-icon-button matSuffix type="button" aria-label="Spracheingabe Name"
+          [class.is-listening]="listeningField === 'name'"
+          [attr.aria-pressed]="listeningField === 'name'"
+          (click)="startVoiceInput('name')">
           <mat-icon>mic</mat-icon>
         </button>
       </mat-form-field>
@@ -32,10 +35,18 @@
           placeholder="z. B. 500 ml"
           [(ngModel)]="menge"
           name="menge" />
-        <button mat-icon-button matSuffix type="button" aria-label="Spracheingabe Menge" (click)="startVoiceInput('menge')">
+        <button mat-icon-button matSuffix type="button" aria-label="Spracheingabe Menge"
+          [class.is-listening]="listeningField === 'menge'"
+          [attr.aria-pressed]="listeningField === 'menge'"
+          (click)="startVoiceInput('menge')">
           <mat-icon>mic</mat-icon>
         </button>
       </mat-form-field>
+
+      <p class="voice-status" *ngIf="listeningField">
+        <mat-icon>graphic_eq</mat-icon>
+        Höre für {{ listeningField === 'name' ? 'Name' : 'Menge' }} zu…
+      </p>
 
       <mat-form-field appearance="outline" class="w-100">
         <mat-label>Lager auswählen</mat-label>

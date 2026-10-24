@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, Inject } from '@angular/core';
 import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ItemService } from '../../services/api.service';
 
@@ -28,7 +28,8 @@ export class ItemsComponent implements OnInit {
 
   constructor(
     private dialog: MatDialog,
-    private itemService: ItemService
+    private itemService: ItemService,
+    private changeDetector: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -40,11 +41,13 @@ export class ItemsComponent implements OnInit {
       next: (data) => {
         this.items = data;
         this.applyFilters();
+        this.changeDetector.detectChanges();
       },
       error: (error) => {
         console.error('Error loading items:', error);
         this.items = [];
         this.applyFilters();
+        this.changeDetector.detectChanges();
       }
     });
   }
@@ -99,6 +102,7 @@ export class ItemsComponent implements OnInit {
           next: () => {
             this.items = this.items.filter(i => i.id !== item.id);
             this.applyFilters();
+            this.changeDetector.detectChanges();
           },
           error: (error) => {
             console.error('Error deleting item:', error);

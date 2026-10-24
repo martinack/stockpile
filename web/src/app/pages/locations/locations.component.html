@@ -23,7 +23,7 @@
     <mat-divider></mat-divider>
 
     <div class="list-wrap" *ngIf="!loading; else loadingTpl">
-      <mat-list role="list" *ngIf="locations?.length; else emptyTpl">
+      <mat-list role="list" *ngIf="locations.length; else emptyTpl">
         <mat-list-item role="listitem" *ngFor="let loc of locations">
           <mat-icon matListItemIcon>location_on</mat-icon>
           <div matListItemTitle>{{ loc.name }}</div>

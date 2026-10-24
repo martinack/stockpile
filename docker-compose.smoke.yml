@@ -1,0 +1,9 @@
+services:
+  backend:
+    volumes:
+      - smoke-data:/app/data
+      - smoke-qrcodes:/app/qrcodes
+
+volumes:
+  smoke-data:
+  smoke-qrcodes:

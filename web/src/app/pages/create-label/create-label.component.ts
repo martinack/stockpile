@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { LocationsService, StorageLocation } from '../../services/locations.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import {ItemService} from '../../services/api.service';
@@ -11,7 +11,7 @@ import {ItemCreatedDialogComponent} from './item-created-dialog.component';
   templateUrl: './create-label.component.html',
   styleUrl: './create-label.component.scss'
 })
-export class LabelCreateComponent implements OnInit {
+export class LabelCreateComponent implements OnInit, OnDestroy {
   name = '';
   date = new Date().toISOString().split('T')[0];
   menge = '';
@@ -21,7 +21,7 @@ export class LabelCreateComponent implements OnInit {
   selectedWarehouseId: number | null = null;
 
   private recognition?: any;
-  listening = false;
+  listeningField: 'name' | 'menge' | null = null;
 
   constructor(
     private api: ItemService,
@@ -29,10 +29,16 @@ export class LabelCreateComponent implements OnInit {
     private snackBar: MatSnackBar,
     private itemService: ItemService,
     private dialog: MatDialog,
+    private changeDetector: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
     this.loadWarehouses();
+  }
+
+  ngOnDestroy(): void {
+    try { this.recognition?.stop(); } catch {}
+    this.recognition = undefined;
   }
 
   private loadWarehouses(): void {
@@ -41,11 +47,13 @@ export class LabelCreateComponent implements OnInit {
       next: (data) => {
         this.locations = data ?? [];
         this.locationsLoading = false;
+        this.changeDetector.detectChanges();
       },
       error: () => {
         this.locations = [];
         this.locationsLoading = false;
         this.snackBar.open('Fehler beim Laden der Lagerorte.', 'OK', { duration: 3000, verticalPosition: "top" });
+        this.changeDetector.detectChanges();
       }
     });
   }
@@ -69,6 +77,7 @@ export class LabelCreateComponent implements OnInit {
           autoFocus: false,
           restoreFocus: true
         });
+        this.changeDetector.detectChanges();
 
       },
       error: (err) => {
@@ -79,21 +88,25 @@ export class LabelCreateComponent implements OnInit {
           msg = err.error.detail;
         }
         this.snackBar.open(msg, 'OK', { duration: 3000, verticalPosition: "top" });
+        this.changeDetector.detectChanges();
       }
     });
   }
 
-  startVoiceInput(field: 'name' | 'menge') {
-    // Vorherige Erkennung sauber stoppen
-    if (this.recognition) {
-      try { this.recognition.stop(); } catch {}
-      this.recognition = undefined;
-    }
-
+  startVoiceInput(field: 'name' | 'menge'): void {
     const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
     if (!SpeechRecognition) {
-      this.snackBar?.open?.('Spracheingabe wird von diesem Browser nicht unterstützt.', 'OK', { duration: 3000 });
+      this.snackBar.open('Spracherkennung wird von diesem Browser nicht unterstützt. Bitte Chrome verwenden.', 'OK', { duration: 4500, verticalPosition: 'top' });
       return;
+    }
+    if (!window.isSecureContext) {
+      this.snackBar.open('Spracherkennung benötigt HTTPS (localhost ist ausgenommen).', 'OK', { duration: 4500, verticalPosition: 'top' });
+      return;
+    }
+
+    // A stopped older instance may still emit onend; its callbacks are ignored.
+    if (this.recognition) {
+      try { this.recognition.stop(); } catch {}
     }
 
     const recognition = new SpeechRecognition();
@@ -106,19 +119,24 @@ export class LabelCreateComponent implements OnInit {
     let endGuard: any;
 
     recognition.onstart = () => {
-      this.listening = true;
-      // Fallback: falls onspeechend nicht feuert, nach 3.5s stoppen
+      if (this.recognition !== recognition) return;
+      this.listeningField = field;
+      this.changeDetector.detectChanges();
+
+      // Fallback: falls onspeechend nicht feuert, nach sechs Sekunden stoppen.
       endGuard = setTimeout(() => {
         try { recognition.stop(); } catch {}
-      }, 3500);
+      }, 6000);
     };
 
     recognition.onresult = (event: any) => {
+      if (this.recognition !== recognition) return;
       // Nimm das letzte (finale) Ergebnis
       const res = event.results[event.results.length - 1];
       const text = res[0]?.transcript ?? '';
       if (field === 'name') this.name = text;
       if (field === 'menge') this.menge = text;
+      this.changeDetector.detectChanges();
       // Nach Ergebnis beenden (da continuous=false meist automatisch endet)
       try { recognition.stop(); } catch {}
     };
@@ -129,27 +147,37 @@ export class LabelCreateComponent implements OnInit {
     };
 
     recognition.onend = () => {
-      this.listening = false;
+      if (this.recognition !== recognition) return;
+      this.listeningField = null;
       if (endGuard) { clearTimeout(endGuard); endGuard = undefined; }
-      // Aufräumen
-      if (this.recognition === recognition) {
-        this.recognition = undefined;
-      }
+      this.recognition = undefined;
+      this.changeDetector.detectChanges();
     };
 
     recognition.onerror = (e: any) => {
-      this.listening = false;
+      if (this.recognition !== recognition) return;
+      this.listeningField = null;
       if (endGuard) { clearTimeout(endGuard); endGuard = undefined; }
-      // Optionale, kurze Nutzerinfo
       const type = e?.error;
       let msg = 'Fehler bei der Spracheingabe.';
       if (type === 'no-speech') msg = 'Keine Sprache erkannt.';
       else if (type === 'audio-capture') msg = 'Kein Mikrofon gefunden.';
       else if (type === 'not-allowed') msg = 'Mikrofon-Zugriff verweigert.';
-      this.snackBar?.open?.(msg, 'OK', { duration: 2500 });
+      else if (type === 'service-not-allowed') msg = 'Der Spracherkennungsdienst ist in diesem Browser deaktiviert.';
+      else if (type === 'network') msg = 'Der Spracherkennungsdienst ist nicht erreichbar.';
+      this.snackBar.open(msg, 'OK', { duration: 3500, verticalPosition: 'top' });
+      this.changeDetector.detectChanges();
     };
 
-    recognition.start();
-
+    try {
+      recognition.start();
+    } catch {
+      if (this.recognition === recognition) {
+        this.recognition = undefined;
+        this.listeningField = null;
+      }
+      this.snackBar.open('Spracherkennung konnte nicht gestartet werden.', 'OK', { duration: 3500, verticalPosition: 'top' });
+      this.changeDetector.detectChanges();
+    }
   }
 }
