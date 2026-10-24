@@ -89,3 +89,66 @@
     }
   }
 }
+
+@media (max-width: 600px) {
+  .items-page {
+    padding: 0;
+  }
+
+  .items-table,
+  .items-table tbody {
+    display: block;
+  }
+
+  .items-table .mat-mdc-header-row {
+    display: none;
+  }
+
+  .items-table .mat-mdc-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    margin: 12px 0;
+    padding: 4px 0;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #fff;
+  }
+
+  .items-table .mat-mdc-cell {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    min-width: 0;
+    padding: 8px 12px;
+    border: 0;
+  }
+
+  .items-table .mat-mdc-cell::before {
+    content: attr(data-label);
+    flex: 0 0 auto;
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .items-table .mat-column-name {
+    grid-column: 1;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .items-table .mat-column-name::before {
+    display: none;
+  }
+
+  .items-table .actions-cell {
+    grid-column: 2;
+    grid-row: 1;
+    padding: 0 4px;
+  }
+
+  .items-table .actions-cell::before {
+    display: none;
+  }
+}
