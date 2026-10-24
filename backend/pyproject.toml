@@ -12,7 +12,8 @@ dependencies = [
   "fastapi[standard]>=0.115",
   "httpx>=0.28",
   "pydantic>=2.10",
-  "psycopg[binary]>=3.2",
+  "psycopg[binary]>=3.2; platform_machine != 'armv7l'",
+  "psycopg[c]>=3.2; platform_machine == 'armv7l'",
   "qrcode[pil]>=8.0",
   "sqlalchemy>=2.0",
 ]

@@ -11,7 +11,7 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 
-BASE_URL = os.getenv("STOCKPILE_SMOKE_URL", "https://localhost/api")
+BASE_URL = os.getenv("STOCKPILE_SMOKE_URL", "https://localhost:8443/api")
 
 
 def request(path: str, method: str = "GET", payload: dict | None = None) -> tuple[int, bytes, str]:

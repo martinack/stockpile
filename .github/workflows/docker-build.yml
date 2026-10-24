@@ -8,7 +8,7 @@ on:
 
 jobs:
   verify-code:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
       - uses: astral-sh/setup-uv@v7
@@ -27,10 +27,10 @@ jobs:
         run: |
           npm ci
           npm run build
-          npm test -- --watch=false
+          npm test -- --watch=false --browsers=ChromeHeadless
 
   verify-compose:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
       - name: Build and start the smoke-test stack
