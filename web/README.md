@@ -1,21 +1,25 @@
 # Stockpile web frontend
 
-This Angular 22 application is served by Nginx in Docker and uses relative `/api` URLs. In Docker, Nginx proxies those calls to the backend. During development, `proxy.conf.json` proxies them to `http://localhost:9000`.
+The Angular 22 frontend makes only relative `/api` requests. In production,
+Caddy terminates HTTPS and routes `/api/*` to the private FastAPI container;
+Nginx serves only the Angular files. This keeps the browser on one HTTPS origin.
 
 ## Development
 
-Use Node.js 24.15.0 or newer:
+Use Node.js 22 or newer:
 
 ```bash
 npm ci
 npm start
 ```
 
-Open <http://localhost:4200>. Start the backend on port 9000 first if you need API calls.
+Open <http://localhost:4200>. The development proxy maps `/api` to a separately
+started backend at `http://localhost:9000`; it is not part of the production
+Docker deployment.
 
 ## Checks
 
 ```bash
 npm run build
-npm test
+npm test -- --watch=false
 ```

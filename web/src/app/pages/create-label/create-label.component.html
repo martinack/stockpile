@@ -31,10 +31,10 @@
         <mat-label>Menge</mat-label>
         <input
           matInput
-          type="text"
-          placeholder="z. B. 500 ml"
-          [(ngModel)]="menge"
-          name="menge" />
+          type="number" min="0.001" step="0.001"
+          placeholder="z. B. 3"
+          [(ngModel)]="quantityValue"
+          name="quantityValue" required />
         <button mat-icon-button matSuffix type="button" aria-label="Spracheingabe Menge"
           [class.is-listening]="listeningField === 'menge'"
           [attr.aria-pressed]="listeningField === 'menge'"
@@ -49,6 +49,14 @@
       </p>
 
       <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Einheit</mat-label>
+        <mat-select [(ngModel)]="selectedUnitId" name="unitId" required [disabled]="!units.length">
+          <mat-option *ngFor="let unit of units" [value]="unit.id">{{ unit.name }}</mat-option>
+        </mat-select>
+        <mat-hint *ngIf="!units.length">Bitte unter Einheiten zuerst eine Einheit anlegen.</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-100">
         <mat-label>Lager auswählen</mat-label>
         <mat-select [(ngModel)]="selectedWarehouseId" name="warehouseId" [disabled]="locationsLoading" required>
           <mat-option [value]="null">Keinem Lager zuordnen</mat-option>
@@ -60,12 +68,12 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>Datum</mat-label>
+        <mat-label>Einlagerungsdatum</mat-label>
         <input
           matInput
           [matDatepicker]="picker"
-          [(ngModel)]="date"
-          name="date" />
+          [(ngModel)]="storageDate"
+          name="storageDate" />
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
       </mat-form-field>

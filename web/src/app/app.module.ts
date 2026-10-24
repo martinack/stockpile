@@ -21,7 +21,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import {MatNativeDateModule, MatOption} from '@angular/material/core';
-import { MatSliderModule } from '@angular/material/slider';
 // Add these for list view
 import { MatListModule } from '@angular/material/list';
 import { MatDividerModule } from '@angular/material/divider';
@@ -33,9 +32,10 @@ import { LocationsComponent } from './pages/locations/locations.component';
 import { LocationsCreateDialogComponent } from './pages/locations/locations-create-dialog.component';
 import {MatSelectModule} from '@angular/material/select';
 import {ItemCreatedDialogComponent} from './pages/create-label/item-created-dialog.component';
-import { ItemsComponent, DeleteConfirmDialogComponent } from './pages/items/items.component';
+import { ItemsComponent } from './pages/items/items.component';
 import { MatTableModule } from '@angular/material/table';
 import { MatRippleModule } from '@angular/material/core';
+import { UnitsComponent } from './pages/units/units.component';
 
 @NgModule({
   declarations: [
@@ -47,7 +47,7 @@ import { MatRippleModule } from '@angular/material/core';
     LocationsCreateDialogComponent,
     ItemCreatedDialogComponent,
     ItemsComponent,
-    DeleteConfirmDialogComponent,
+    UnitsComponent,
   ],
   imports: [
     ZXingScannerModule,
@@ -63,7 +63,6 @@ import { MatRippleModule } from '@angular/material/core';
     MatInputModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatSliderModule,
     MatListModule,
     MatDividerModule,
     MatDialogModule,

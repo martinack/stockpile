@@ -1,3 +1,4 @@
 .idea/
 stockpile-backend.tar
 stockpile-frontend.tar
+.env

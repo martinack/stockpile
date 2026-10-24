@@ -1,0 +1,26 @@
+{
+	# Browsers intentionally omit SNI when connecting to a numeric IP address.
+	# Select this site's certificate in that case instead of Caddy attempting to
+	# match the Docker container's internal IP.
+	default_sni {$STOCKPILE_HOST:localhost}
+}
+
+http://{$STOCKPILE_HOST:localhost}:{$STOCKPILE_HTTP_PORT:8081} {
+	redir https://{$STOCKPILE_HOST:localhost}:{$STOCKPILE_HTTPS_PORT:8443}{uri} permanent
+}
+
+https://{$STOCKPILE_HOST:localhost}:{$STOCKPILE_HTTPS_PORT:8443} {
+	tls internal
+	# Reindexing is an operator recovery action.  It remains available through
+	# `docker compose exec backend python -m stockpile.reindex`, never publicly.
+	handle /api/admin/* {
+		respond "not found" 404
+	}
+	handle /api/* {
+		uri strip_prefix /api
+		reverse_proxy backend:8000
+	}
+	handle {
+		reverse_proxy frontend:80
+	}
+}

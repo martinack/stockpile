@@ -1,22 +1,70 @@
 name: stockpile
 
 services:
+  caddy:
+    image: caddy:2.10-alpine
+    # Non-standard defaults avoid clashing with an existing web server.
+    ports: ["${STOCKPILE_HTTP_PORT:-8081}:${STOCKPILE_HTTP_PORT:-8081}", "${STOCKPILE_HTTPS_PORT:-8443}:${STOCKPILE_HTTPS_PORT:-8443}"]
+    environment:
+      STOCKPILE_HOST: ${STOCKPILE_HOST:-localhost}
+      STOCKPILE_HTTP_PORT: ${STOCKPILE_HTTP_PORT:-8081}
+      STOCKPILE_HTTPS_PORT: ${STOCKPILE_HTTPS_PORT:-8443}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      backend: {condition: service_healthy}
+      frontend: {condition: service_healthy}
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: stockpile
+      POSTGRES_USER: stockpile
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-stockpile}
+    # A new named volume makes the planned clean PostgreSQL inventory explicit;
+    # any previous Docker PostgreSQL volume remains untouched for recovery.
+    volumes: ["postgres_data_v2:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U stockpile -d stockpile"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  solr:
+    image: solr:9.9
+    command: solr-precreate stockpile
+    volumes: ["solr_data_v2:/var/solr"]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8983/solr/stockpile/admin/ping | grep -q OK"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
   backend:
     build: ./backend
-    container_name: stockpile-backend
-    ports:
-      - "9000:8000"
-    volumes:
-      - ./backend/data:/app/data
-      - ./backend/qrcodes:/app/qrcodes
+    environment:
+      DATABASE_URL: postgresql+psycopg://stockpile:${POSTGRES_PASSWORD:-stockpile}@postgres:5432/stockpile
+      SOLR_URL: http://solr:8983/solr/stockpile
+      STOCKPILE_QRCODES_DIR: /app/qrcodes
+    volumes: ["./backend/qrcodes:/app/qrcodes"]
+    depends_on:
+      postgres: {condition: service_healthy}
+      solr: {condition: service_healthy}
     restart: unless-stopped
 
   frontend:
     build: ./web
-    container_name: stockpile-frontend
-    ports:
-      - "8080:80"
     depends_on:
-      backend:
-        condition: service_healthy
+      backend: {condition: service_healthy}
     restart: unless-stopped
+
+volumes:
+  postgres_data_v2:
+  solr_data_v2:
+  caddy_data:
+  caddy_config:

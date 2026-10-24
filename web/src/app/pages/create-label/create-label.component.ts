@@ -4,6 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import {ItemService} from '../../services/api.service';
 import {MatDialog} from '@angular/material/dialog';
 import {ItemCreatedDialogComponent} from './item-created-dialog.component';
+import { Unit, UnitsService } from '../../services/units.service';
 
 @Component({
   selector: 'app-create-label',
@@ -14,11 +15,14 @@ import {ItemCreatedDialogComponent} from './item-created-dialog.component';
 export class LabelCreateComponent implements OnInit, OnDestroy {
   name = '';
   date = new Date().toISOString().split('T')[0];
-  menge = '';
+  quantityValue: number | null = null;
+  storageDate: Date | null = new Date();
 
   locations: StorageLocation[] = [];
   locationsLoading = false;
   selectedWarehouseId: number | null = null;
+  units: Unit[] = [];
+  selectedUnitId: number | null = null;
 
   private recognition?: any;
   listeningField: 'name' | 'menge' | null = null;
@@ -26,6 +30,7 @@ export class LabelCreateComponent implements OnInit, OnDestroy {
   constructor(
     private api: ItemService,
     private locationsService: LocationsService,
+    private unitsService: UnitsService,
     private snackBar: MatSnackBar,
     private itemService: ItemService,
     private dialog: MatDialog,
@@ -34,6 +39,11 @@ export class LabelCreateComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadWarehouses();
+    this.loadUnits();
+  }
+
+  private loadUnits(): void {
+    this.unitsService.list().subscribe({ next: units => { this.units = units; this.selectedUnitId = units[0]?.id ?? null; this.changeDetector.detectChanges(); }, error: () => { this.snackBar.open('Bitte zuerst eine Einheit anlegen.', 'OK'); this.changeDetector.detectChanges(); } });
   }
 
   ngOnDestroy(): void {
@@ -46,6 +56,7 @@ export class LabelCreateComponent implements OnInit, OnDestroy {
     this.locationsService.list().subscribe({
       next: (data) => {
         this.locations = data ?? [];
+        this.selectedWarehouseId = this.locations[0]?.id ?? null;
         this.locationsLoading = false;
         this.changeDetector.detectChanges();
       },
@@ -66,14 +77,15 @@ export class LabelCreateComponent implements OnInit, OnDestroy {
     }
 
     const warehouseId = this.selectedWarehouseId ?? null;
+    if (this.quantityValue === null || this.quantityValue <= 0 || this.selectedUnitId === null) { this.snackBar.open('Bitte eine positive Menge und Einheit angeben.', 'OK'); return; }
 
-    this.itemService.createItem(trimmed, warehouseId, this.menge?.trim() || null).subscribe({
+    this.itemService.createItem(trimmed, this.quantityValue, this.selectedUnitId, warehouseId, this.storageDate ? this.storageDate.toISOString().slice(0, 10) : null).subscribe({
       next: (created) => {
         this.snackBar.open('Label erfolgreich erstellt.', 'OK', { duration: 3000, verticalPosition: "top" });
 
         this.dialog.open(ItemCreatedDialogComponent, {
           width: '420px',
-          data: created,
+          data: { ...created, title: 'Label erstellt' },
           autoFocus: false,
           restoreFocus: true
         });
@@ -135,7 +147,7 @@ export class LabelCreateComponent implements OnInit, OnDestroy {
       const res = event.results[event.results.length - 1];
       const text = res[0]?.transcript ?? '';
       if (field === 'name') this.name = text;
-      if (field === 'menge') this.menge = text;
+      if (field === 'menge') this.quantityValue = Number(text.replace(',', '.').match(/[0-9]+(?:[.,][0-9]+)?/)?.[0] ?? null);
       this.changeDetector.detectChanges();
       // Nach Ergebnis beenden (da continuous=false meist automatisch endet)
       try { recognition.stop(); } catch {}

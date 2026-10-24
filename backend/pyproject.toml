@@ -8,8 +8,11 @@ version = "0.3.0"
 description = "Backend API for Stockpile"
 requires-python = ">=3.13"
 dependencies = [
+  "alembic>=1.14",
   "fastapi[standard]>=0.115",
+  "httpx>=0.28",
   "pydantic>=2.10",
+  "psycopg[binary]>=3.2",
   "qrcode[pil]>=8.0",
   "sqlalchemy>=2.0",
 ]

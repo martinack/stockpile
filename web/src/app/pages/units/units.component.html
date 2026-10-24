@@ -1,0 +1,5 @@
+<mat-card><mat-card-header><mat-card-title>Einheiten</mat-card-title><mat-card-subtitle>Mengen-Einheiten verwalten</mat-card-subtitle></mat-card-header><mat-card-content>
+  <div class="new-unit"><mat-form-field appearance="outline"><mat-label>Neue Einheit</mat-label><input matInput [(ngModel)]="name" (keyup.enter)="create()" placeholder="z. B. Glas, Stück, g"></mat-form-field><button mat-raised-button color="primary" (click)="create()">Hinzufügen</button></div>
+  <mat-list *ngIf="!loading"><mat-list-item *ngFor="let unit of units"><span matListItemTitle>{{ unit.name }}</span><button mat-icon-button color="warn" (click)="remove(unit)" aria-label="Einheit deaktivieren"><mat-icon>delete</mat-icon></button></mat-list-item></mat-list>
+  <p *ngIf="!loading && !units.length">Noch keine Einheiten vorhanden.</p>
+</mat-card-content></mat-card>

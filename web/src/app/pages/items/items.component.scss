@@ -22,6 +22,9 @@
   }
 }
 
+.filters { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); margin: 16px 0; }
+.range { display: grid; min-width: 180px; }
+
 .table-container {
   border-radius: 8px;
   overflow: hidden;
@@ -56,6 +59,10 @@
 
   td, th {
     padding: 1rem;
+  }
+
+  .item-row {
+    cursor: pointer;
   }
 
   tr:hover {

@@ -5,7 +5,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
   selector: 'app-item-created-dialog',
   standalone: false,
   template: `
-    <h2 mat-dialog-title>Label erstellt</h2>
+    <h2 mat-dialog-title>{{ data.title ?? 'QR-Label' }}</h2>
     <mat-dialog-content class="content">
       <div class="meta">
         <div><strong>Name:</strong> {{ data.name }}</div>
@@ -41,7 +41,7 @@ export class ItemCreatedDialogComponent {
 
   constructor(
     private dialogRef: MatDialogRef<ItemCreatedDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { id: number; code: string; name: string; warehouse_id: number | null }
+    @Inject(MAT_DIALOG_DATA) public data: { id: number; code: string; name: string; warehouse_id: number | null; title?: string }
   ) {
     this.qrUrl = data?.code ? `${this.baseUrl}/qrcode/${data.code}` : null;
   }

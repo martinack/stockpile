@@ -14,11 +14,12 @@ mat-toolbar {
 }
 
 .app-container {
+  --bottom-nav-clearance: 80px;
   padding: 16px;
   max-width: 960px;
   margin: 0 auto;
   // Reserve space so the bottom-nav doesn't overlap content on mobile
-  padding-bottom: calc(72px + env(safe-area-inset-bottom));
+  padding-bottom: calc(var(--bottom-nav-clearance) + env(safe-area-inset-bottom));
 }
 
 /* Bottom nav: visible only on small screens */
@@ -68,6 +69,8 @@ mat-toolbar {
 @media (max-width: 600px) {
   .app-container {
     padding: 12px;
+    // The shorthand above would otherwise overwrite the footer clearance.
+    padding-bottom: calc(var(--bottom-nav-clearance) + env(safe-area-inset-bottom));
   }
   .bottom-nav {
     display: block;

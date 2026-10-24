@@ -8,8 +8,8 @@ export class ItemService {
 
   constructor(private http: HttpClient) {}
 
-  createItem(name: string, warehouseId: number | null = null, quantity: string | null = null): Observable<any> {
-    return this.http.post(`${this.baseUrl}/`, { name, quantity, warehouse_id: warehouseId });
+  createItem(name: string, quantityValue: number, unitId: number, warehouseId: number | null, storageDate: string | null): Observable<any> {
+    return this.http.post(`${this.baseUrl}/`, { name, quantity_value: quantityValue, unit_id: unitId, warehouse_id: warehouseId, storage_date: storageDate });
   }
 
   getItem(code: string): Observable<any> {
@@ -20,12 +20,9 @@ export class ItemService {
     return this.http.post(`${this.baseUrl}/${code}/checkout`, {});
   }
 
-  listItems(search?: string): Observable<any> {
-    let url = `${this.baseUrl}/`;
-    if (search) {
-      url += `?search=${encodeURIComponent(search)}`;
-    }
-    return this.http.get(url);
+  searchItems(params: Record<string, string | number | null>): Observable<any> {
+    const query = Object.entries(params).filter(([, value]) => value !== null && value !== '').map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`).join('&');
+    return this.http.get(`${this.baseUrl}/search/${query ? `?${query}` : ''}`);
   }
 
   deleteItem(itemId: number): Observable<any> {
